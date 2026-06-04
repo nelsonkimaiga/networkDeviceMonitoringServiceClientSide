@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { X, Globe, MapPin, Calendar, Clock, Activity } from 'lucide-react';
+import { X, Clock } from 'lucide-react';
 import { deviceApi } from '../api/deviceApi';
 import type { DeviceDetails } from '../types';
 import { LoadingSpinner, ErrorAlert, StatusBadge } from './Common';
@@ -43,7 +43,7 @@ export const DeviceDetailsModal: React.FC<Props> = ({ deviceId, onClose }) => {
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
         <div className="px-6 py-4 bg-slate-900 flex justify-between items-center text-white">
           <div>
-            <h2 className="font-bold text-lg">{details?.name || 'Device Monitoring'}</h2>
+            <h2 className="font-bold text-lg">{details?.name}</h2>
             <p className="text-[10px] font-mono text-slate-400">{deviceId}</p>
           </div>
           <button onClick={onClose} className="hover:text-slate-300 p-1">
@@ -57,53 +57,45 @@ export const DeviceDetailsModal: React.FC<Props> = ({ deviceId, onClose }) => {
 
           {details && (
             <div className="space-y-8">
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start">
-                  <Globe className="h-5 w-5 text-blue-500 mr-3 mt-0.5" />
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">IP Address</span>
-                    <p className="font-mono text-sm font-semibold">{details.ipAddress}</p>
-                  </div>
+              {/* Line Item Metadata */}
+              <div className="space-y-3 border-b pb-6">
+                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">IP Address</span>
+                  <span className="font-mono font-semibold text-slate-700">{details.ipAddress}</span>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start">
-                  <MapPin className="h-5 w-5 text-red-500 mr-3 mt-0.5" />
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Site Location</span>
-                    <p className="text-sm font-semibold">{details.location}</p>
-                  </div>
+                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Physical Site</span>
+                  <span className="font-semibold text-slate-700">{details.location}</span>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start">
-                  <Activity className="h-5 w-5 text-green-500 mr-3 mt-0.5" />
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Device Type</span>
-                    <p className="text-sm font-semibold">{details.deviceType}</p>
-                  </div>
+                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Device Name</span>
+                  <span className="font-semibold text-slate-700">{details.name}</span>
                 </div>
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-start">
-                  <Calendar className="h-5 w-5 text-amber-500 mr-3 mt-0.5" />
-                  <div>
-                    <span className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Registered</span>
-                    <p className="text-sm font-semibold">{format(new Date(details.registeredAt), 'MMM dd, yyyy HH:mm')}</p>
-                  </div>
+                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Device Type</span>
+                  <span className="font-semibold text-slate-700">{details.deviceType}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
+                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Registration Date</span>
+                  <span className="font-semibold text-slate-700">{format(new Date(details.registeredAt), 'MMMM dd, yyyy HH:mm')}</span>
                 </div>
               </div>
 
               {/* Status History */}
               <div>
-                <h3 className="text-xs font-black text-slate-900 uppercase tracking-widest mb-4 border-b pb-2">Recent Status Reports</h3>
-                <div className="space-y-3">
+                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Device status History</h3>
+                <div className="space-y-2">
                   {details.recentReports.length === 0 ? (
                     <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-200">
                       <p className="text-slate-400 text-sm">No device history available.</p>
                     </div>
                   ) : (
                     details.recentReports.map(report => (
-                      <div key={report.id} className="flex items-center justify-between p-3 bg-white border border-slate-200 rounded-lg shadow-sm">
+                      <div key={report.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg shadow-sm">
                         <div className="flex items-center gap-4">
                           <StatusBadge status={report.status} />
                           <div>
-                            <p className="text-xs font-medium text-slate-700">{report.message || 'Heartbeat signal received.'}</p>
+                            <p className="text-xs font-semibold text-slate-700">{report.message || 'Standard heartbeat.'}</p>
                             <div className="flex items-center text-[10px] text-slate-400 mt-0.5">
                               <Clock className="h-3 w-3 mr-1" />
                               {format(new Date(report.createdAt), 'MMM dd, HH:mm:ss')}

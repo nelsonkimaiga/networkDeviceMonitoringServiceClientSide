@@ -72,7 +72,7 @@ export const Dashboard: React.FC = () => {
                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Device Name</th>
                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
                   <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Status</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Last Check-in</th>
+                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Date</th>
                   <th className="px-6 py-4 text-right"></th>
                 </tr>
               </thead>
@@ -114,7 +114,7 @@ export const Dashboard: React.FC = () => {
                         <div className="text-xs font-medium text-slate-700">
                           {device.lastReportAt
                             ? format(new Date(device.lastReportAt), 'MMM dd, HH:mm')
-                            : 'Never Reported'}
+                            : 'Not Available'}
                         </div>
                       </td>
                       <td className="px-6 py-5 text-right">
