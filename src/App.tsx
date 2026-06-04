@@ -1,27 +1,28 @@
 import { Dashboard } from './views/Dashboard';
+import { Navbar, Container } from 'react-bootstrap';
+import './App.css';
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      <nav className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16 items-center">
-            <div className="flex items-center">
-              <span className="text-lg font-black tracking-tighter text-slate-900 pr-4 mr-4">BCS MONITOR</span>
-            </div>
-            <div className="flex items-center space-x-4">
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="d-flex flex-column min-vh-100 bg-light">
+      <Navbar bg="white" border="bottom" className="border-bottom mb-4">
+        <Container>
+          <Navbar.Brand href="#home" className="fw-black tracking-tighter text-dark">
+            BCS MONITOR
+          </Navbar.Brand>
+        </Container>
+      </Navbar>
 
-      <main>
+      <main className="flex-grow-1">
         <Dashboard />
       </main>
 
-      <footer className="mt-auto py-8 border-t border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-        </div>
+      <footer className="mt-auto py-4 border-top bg-white">
+        <Container className="d-flex justify-content-between align-items-center">
+          <span className="small text-uppercase fw-bold text-muted" style={{ fontSize: '10px', letterSpacing: '0.1em' }}>
+            © 2026 BCS Group
+          </span>
+        </Container>
       </footer>
     </div>
   );

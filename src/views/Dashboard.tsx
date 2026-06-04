@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { Plus, RefreshCcw, AlertTriangle, ChevronRight, Activity } from 'lucide-react';
+import { Plus, RefreshCcw, AlertTriangle, ChevronRight } from 'lucide-react';
+import { Container, Row, Col, Button, Table, Badge, Card } from 'react-bootstrap';
 import { deviceApi } from '../api/deviceApi';
 import type { DeviceSummary } from '../types';
 import { LoadingSpinner, ErrorAlert, StatusBadge } from '../components/Common';
@@ -34,52 +35,54 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <Container className="py-4">
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
-        <div className="flex items-center">
-        </div>
-
-        <div className="flex items-center gap-3">
-          <button
+      <Row className="align-items-center mb-4 g-3">
+        <Col md={true}>
+          <h2 className="mb-0 fw-bold">Device Dashboard</h2>
+        </Col>
+        <Col md="auto" className="d-flex gap-2">
+          <Button
+            variant="outline-secondary"
             onClick={fetchDevices}
-            className="p-2.5 text-slate-500 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"
             title="Refresh"
+            className="d-flex align-items-center"
           >
-            <RefreshCcw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-          </button>
-          <button
+            <RefreshCcw size={18} className={loading ? 'rotate-animation' : ''} />
+          </Button>
+          <Button
+            variant="primary"
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg font-bold shadow-lg shadow-blue-200 transition-all active:scale-95"
+            className="d-flex align-items-center fw-bold"
           >
-            <Plus className="h-5 w-5 mr-2" />
+            <Plus size={18} className="me-2" />
             Register New Device
-          </button>
-        </div>
-      </div>
+          </Button>
+        </Col>
+      </Row>
 
       {error && <ErrorAlert message={error} onClose={() => setError(null)} />}
 
       {/* Main Content Area */}
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        {loading && devices.length === 0 ? (
-          <LoadingSpinner />
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-slate-50 border-b border-slate-200">
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Device Name</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Type</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Status</th>
-                  <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Registration Date</th>
-                  <th className="px-6 py-4 text-right"></th>
+      <Card className="shadow-sm border-0">
+        <Card.Body className="p-0">
+          {loading && devices.length === 0 ? (
+            <LoadingSpinner />
+          ) : (
+            <Table responsive hover className="mb-0 align-middle">
+              <thead className="bg-light">
+                <tr>
+                  <th className="px-4 py-3 small text-uppercase fw-black text-muted" style={{ letterSpacing: '0.1em' }}>Device Name</th>
+                  <th className="px-4 py-3 small text-uppercase fw-black text-muted" style={{ letterSpacing: '0.1em' }}>Type</th>
+                  <th className="px-4 py-3 small text-uppercase fw-black text-muted" style={{ letterSpacing: '0.1em' }}>Current Status</th>
+                  <th className="px-4 py-3 small text-uppercase fw-black text-muted" style={{ letterSpacing: '0.1em' }}>Registration Date</th>
+                  <th className="px-4 py-3 text-end"></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody>
                 {devices.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400 font-medium">
+                    <td colSpan={5} className="px-4 py-5 text-center text-muted">
                       No network devices found. Register a device to start.
                     </td>
                   </tr>
@@ -88,48 +91,46 @@ export const Dashboard: React.FC = () => {
                     <tr
                       key={device.id}
                       onClick={() => setSelectedDeviceId(device.id)}
-                      className="group hover:bg-blue-50/30 cursor-pointer transition-colors"
+                      style={{ cursor: 'pointer' }}
                     >
-                      <td className="px-6 py-5">
-                        <div className="font-bold text-slate-900 group-hover:text-blue-700 transition-colors">{device.name}</div>
-                        <div className="text-[10px] font-mono text-slate-400 tracking-tighter">{device.id}</div>
+                      <td className="px-4 py-3">
+                        <div className="fw-bold text-dark">{device.name}</div>
+                        <div className="small text-muted font-monospace">{device.id}</div>
                       </td>
-                      <td className="px-6 py-5">
-                        <span className="text-xs font-semibold text-slate-600 bg-slate-100 px-2 py-1 rounded">
+                      <td className="px-4 py-3">
+                        <Badge bg="light" text="dark" className="border">
                           {device.deviceType}
-                        </span>
+                        </Badge>
                       </td>
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-2">
+                      <td className="px-4 py-3">
+                        <div className="d-flex align-items-center gap-2">
                           <StatusBadge status={device.currentStatus} />
                           {device.stale && (
-                            <span className="flex items-center bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full text-[10px] font-black border border-orange-200 animate-pulse">
-                              <AlertTriangle className="h-3 w-3 mr-1" />
+                            <Badge bg="warning" text="dark" className="d-flex align-items-center text-uppercase" style={{ fontSize: '10px' }}>
+                              <AlertTriangle size={12} className="me-1" />
                               STALE
-                            </span>
+                            </Badge>
                           )}
                         </div>
                       </td>
-                      <td className="px-6 py-5">
-                        <div className="text-xs font-medium text-slate-700">
+                      <td className="px-4 py-3">
+                        <div className="small fw-medium text-secondary">
                           {device.lastReportAt
                             ? format(new Date(device.lastReportAt), 'MMM dd, HH:mm')
                             : 'Not Available'}
                         </div>
                       </td>
-                      <td className="px-6 py-5 text-right">
-                        <button className="text-slate-300 group-hover:text-blue-500 transition-colors">
-                          <ChevronRight className="h-5 w-5" />
-                        </button>
+                      <td className="px-4 py-3 text-end">
+                        <ChevronRight size={20} className="text-muted" />
                       </td>
                     </tr>
                   ))
                 )}
               </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+            </Table>
+          )}
+        </Card.Body>
+      </Card>
 
       <RegistrationModal
         isOpen={isModalOpen}
@@ -141,6 +142,16 @@ export const Dashboard: React.FC = () => {
         deviceId={selectedDeviceId}
         onClose={() => setSelectedDeviceId(null)}
       />
-    </div>
+
+      <style>{`
+        .rotate-animation {
+          animation: rotate 1s linear infinite;
+        }
+        @keyframes rotate {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
+    </Container>
   );
 };

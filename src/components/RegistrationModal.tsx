@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { Modal, Button, Form, Alert } from 'react-bootstrap';
 import { deviceApi } from '../api/deviceApi';
 import type { DeviceType } from '../types';
 
@@ -21,8 +21,6 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!isOpen) return null;
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -31,6 +29,12 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
       await deviceApi.registerDevice(formData);
       onSuccess();
       onClose();
+      setFormData({
+        name: '',
+        deviceType: 'ROUTER',
+        ipAddress: '',
+        location: '',
+      });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to register device. Check inputs.');
     } finally {
@@ -39,72 +43,71 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
   };
 
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
-        <div className="px-6 py-4 bg-slate-900 flex justify-between items-center text-white">
-          <h2 className="font-bold text-lg">Register New Device</h2>
-          <button onClick={onClose} className="hover:text-slate-300">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {error && <div className="p-3 bg-red-50 text-red-600 text-sm rounded border border-red-100">{error}</div>}
-
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Device Name</label>
-            <input
+    <Modal show={isOpen} onHide={onClose} centered>
+      <Modal.Header closeButton className="bg-dark text-white border-0">
+        <Modal.Title className="fw-bold fs-5">Register New Device</Modal.Title>
+      </Modal.Header>
+      <Modal.Body className="p-4">
+        {error && <Alert variant="danger" className="py-2 small">{error}</Alert>}
+        <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label className="small fw-bold text-muted text-uppercase tracking-wider">Device Name</Form.Label>
+            <Form.Control
               required
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              type="text"
+              placeholder="e.g. Core Switch 01"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
-              placeholder="device name"
+              className="bg-light border-0"
             />
-          </div>
+          </Form.Group>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Type</label>
-            <select
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none appearance-none"
+          <Form.Group className="mb-3">
+            <Form.Label className="small fw-bold text-muted text-uppercase tracking-wider">Type</Form.Label>
+            <Form.Select
               value={formData.deviceType}
               onChange={e => setFormData({ ...formData, deviceType: e.target.value as DeviceType })}
+              className="bg-light border-0"
             >
               {DEVICE_TYPES.map(t => <option key={t} value={t}>{t.replace('_', ' ')}</option>)}
-            </select>
-          </div>
+            </Form.Select>
+          </Form.Group>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">IP Address</label>
-            <input
+          <Form.Group className="mb-3">
+            <Form.Label className="small fw-bold text-muted text-uppercase tracking-wider">IP Address</Form.Label>
+            <Form.Control
               required
+              type="text"
               pattern="^(\d{1,3}\.){3}\d{1,3}$"
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              placeholder="192.168.1.1"
               value={formData.ipAddress}
               onChange={e => setFormData({ ...formData, ipAddress: e.target.value })}
-              placeholder="hostname or ip address"
+              className="bg-light border-0"
             />
-          </div>
+          </Form.Group>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Site</label>
-            <input
+          <Form.Group className="mb-4">
+            <Form.Label className="small fw-bold text-muted text-uppercase tracking-wider">Site Location</Form.Label>
+            <Form.Control
               required
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              type="text"
+              placeholder="e.g. Data Center A"
               value={formData.location}
               onChange={e => setFormData({ ...formData, location: e.target.value })}
-              placeholder="location"
+              className="bg-light border-0"
             />
-          </div>
+          </Form.Group>
 
-          <button
-            disabled={submitting}
+          <Button
+            variant="primary"
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-200 transition-all active:scale-95 disabled:opacity-50"
+            disabled={submitting}
+            className="w-full py-2 fw-bold shadow-sm"
           >
             {submitting ? 'Processing...' : 'Register Device'}
-          </button>
-        </form>
-      </div>
-    </div>
+          </Button>
+        </Form>
+      </Modal.Body>
+    </Modal>
   );
 };

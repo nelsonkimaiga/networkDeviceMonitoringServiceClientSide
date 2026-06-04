@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { X, Clock } from 'lucide-react';
+import { Clock } from 'lucide-react';
+import { Modal, ListGroup, Badge, Row, Col } from 'react-bootstrap';
 import { deviceApi } from '../api/deviceApi';
 import type { DeviceDetails } from '../types';
 import { LoadingSpinner, ErrorAlert, StatusBadge } from './Common';
@@ -36,81 +37,68 @@ export const DeviceDetailsModal: React.FC<Props> = ({ deviceId, onClose }) => {
     }
   };
 
-  if (!deviceId) return null;
-
   return (
-    <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
-        <div className="px-6 py-4 bg-slate-900 flex justify-between items-center text-white">
-          <div>
-            <h2 className="font-bold text-lg">{details?.name}</h2>
-            <p className="text-[10px] font-mono text-slate-400">{deviceId}</p>
-          </div>
-          <button onClick={onClose} className="hover:text-slate-300 p-1">
-            <X className="h-6 w-6" />
-          </button>
-        </div>
+    <Modal show={!!deviceId} onHide={onClose} size="lg" centered scrollable>
+      <Modal.Header closeButton className="bg-dark text-white border-0">
+        <Modal.Title>
+          <div className="fw-bold fs-5">{details?.name || 'Device Details'}</div>
+          <div className="small font-monospace text-muted" style={{ fontSize: '10px' }}>{deviceId}</div>
+        </Modal.Title>
+      </Modal.Header>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {loading && <LoadingSpinner />}
-          {error && <ErrorAlert message={error} />}
+      <Modal.Body className="p-4 bg-light">
+        {loading && <LoadingSpinner />}
+        {error && <ErrorAlert message={error} />}
 
-          {details && (
-            <div className="space-y-8">
-              {/* Line Item Metadata */}
-              <div className="space-y-3 border-b pb-6">
-                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">IP Address</span>
-                  <span className="font-mono font-semibold text-slate-700">{details.ipAddress}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Physical Site</span>
-                  <span className="font-semibold text-slate-700">{details.location}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Device Name</span>
-                  <span className="font-semibold text-slate-700">{details.name}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Device Type</span>
-                  <span className="font-semibold text-slate-700">{details.deviceType}</span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1 border-b border-slate-50 last:border-0">
-                  <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">Registration Date</span>
-                  <span className="font-semibold text-slate-700">{format(new Date(details.registeredAt), 'MMMM dd, yyyy HH:mm')}</span>
-                </div>
-              </div>
-
-              {/* Status History */}
-              <div>
-                <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4">Device status History</h3>
-                <div className="space-y-2">
-                  {details.recentReports.length === 0 ? (
-                    <div className="text-center py-8 bg-slate-50 rounded-lg border border-dashed border-slate-200">
-                      <p className="text-slate-400 text-sm">No device history available.</p>
-                    </div>
-                  ) : (
-                    details.recentReports.map(report => (
-                      <div key={report.id} className="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg shadow-sm">
-                        <div className="flex items-center gap-4">
-                          <StatusBadge status={report.status} />
-                          <div>
-                            <p className="text-xs font-semibold text-slate-700">{report.message || 'Standard heartbeat.'}</p>
-                            <div className="flex items-center text-[10px] text-slate-400 mt-0.5">
-                              <Clock className="h-3 w-3 mr-1" />
-                              {format(new Date(report.createdAt), 'MMM dd, HH:mm:ss')}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
+        {details && (
+          <div className="space-y-4">
+            {/* Metadata Section */}
+            <div className="bg-white p-3 rounded shadow-sm mb-4">
+              <ListGroup variant="flush">
+                {[
+                  { label: 'IP Address', value: details.ipAddress, mono: true },
+                  { label: 'Physical Site', value: details.location },
+                  { label: 'Device Name', value: details.name },
+                  { label: 'Device Type', value: details.deviceType },
+                  { label: 'Registration Date', value: format(new Date(details.registeredAt), 'MMMM dd, yyyy HH:mm') },
+                ].map((item, idx) => (
+                  <ListGroup.Item key={idx} className="d-flex justify-content-between align-items-center px-0 py-2 border-light">
+                    <span className="small text-muted text-uppercase fw-bold" style={{ fontSize: '10px', letterSpacing: '0.05em' }}>{item.label}</span>
+                    <span className={`fw-semibold ${item.mono ? 'font-monospace' : ''}`}>{item.value}</span>
+                  </ListGroup.Item>
+                ))}
+              </ListGroup>
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+
+            {/* Status History */}
+            <h6 className="small text-muted text-uppercase fw-black tracking-widest mb-3" style={{ fontSize: '10px' }}>Device status History</h6>
+            <div className="space-y-2">
+              {details.recentReports.length === 0 ? (
+                <div className="text-center py-5 bg-white rounded border border-dashed">
+                  <p className="text-muted small mb-0">No device history available.</p>
+                </div>
+              ) : (
+                details.recentReports.map(report => (
+                  <div key={report.id} className="bg-white p-3 rounded border border-light shadow-sm mb-2">
+                    <Row className="align-items-center">
+                      <Col xs="auto">
+                        <StatusBadge status={report.status} />
+                      </Col>
+                      <Col>
+                        <div className="fw-semibold small text-dark">{report.message || 'Standard heartbeat.'}</div>
+                        <div className="d-flex align-items-center text-muted mt-1" style={{ fontSize: '10px' }}>
+                          <Clock size={10} className="me-1" />
+                          {format(new Date(report.createdAt), 'MMM dd, HH:mm:ss')}
+                        </div>
+                      </Col>
+                    </Row>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        )}
+      </Modal.Body>
+    </Modal>
   );
 };
