@@ -55,7 +55,7 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
             <Form.Control
               required
               type="text"
-              placeholder="e.g. Core Switch 01"
+              placeholder="Device Name"
               value={formData.name}
               onChange={e => setFormData({ ...formData, name: e.target.value })}
               className="bg-light border-0"
@@ -79,7 +79,7 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
               required
               type="text"
               pattern="^(\d{1,3}\.){3}\d{1,3}$"
-              placeholder="192.168.1.1"
+              placeholder="hostname or IP address"
               value={formData.ipAddress}
               onChange={e => setFormData({ ...formData, ipAddress: e.target.value })}
               className="bg-light border-0"
@@ -91,7 +91,7 @@ export const RegistrationModal: React.FC<Props> = ({ isOpen, onClose, onSuccess 
             <Form.Control
               required
               type="text"
-              placeholder="e.g. Data Center A"
+              placeholder="Physical location"
               value={formData.location}
               onChange={e => setFormData({ ...formData, location: e.target.value })}
               className="bg-light border-0"
